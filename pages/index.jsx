@@ -89,6 +89,7 @@ const xmur3 = (str) => {
 };
 
 const generateSeed = () => xmur3('' + (new Date().getTime()))() % 90000 + 10000;
+const initialSeed = generateSeed();
 
 const newRand = (seed) => {
   const rng = xmur3('' + seed);
@@ -154,7 +155,7 @@ const Scoreboard = (props) => {
 const capitalize = (str) => str.substr(0, 1).toUpperCase() + str.substr(1);
 
 const Home = (props) => {
-  const [seed, setSeed] = useState(generateSeed());
+  const [seed, setSeed] = useState(initialSeed);
   const [reveal, setReveal] = useState(0);
   const rand = newRand(seed);
   const words = {};
