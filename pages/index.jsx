@@ -40,6 +40,8 @@ const Tray = (props) => <div className={'tray ' + props.team}>
         width: 8rem;
         height: 12em;
         font-size: 0.8rem;
+        font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
+          Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
       }
   `}</style>
 </div>;
@@ -170,7 +172,7 @@ const Home = () => {
           <Tray key='red' team='red' show={team === 'red'} words={redWords} />
         </div>
         <div className='blue team'>
-          <Controls key={seed} team='blue' setTeam={setTeam} />
+          <Controls key={seed} rand={rand} team='blue' setTeam={setTeam} />
           <Tray key='blue' team='blue' show={team === 'blue'} words={blueWords} />
         </div>
       </div>
