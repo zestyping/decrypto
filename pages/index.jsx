@@ -159,12 +159,13 @@ const capitalize = (str) => str.substr(0, 1).toUpperCase() + str.substr(1);
 
 const Home = (props) => {
   const [seed, setSeed] = useState(props.initialSeed);
-  const [reveal, setReveal] = useState(0);
+  const [reveal, setReveal] = useState({});
   const rand = newRand(seed);
   const words = {};
   const url = 'decrypto.vercel.app/player?' + seed;
   for (const team of TEAMS) words[team] = generateWords(rand);
 
+  reveal[seed] = reveal[seed] || {};
   return <div className="container">
     <Head>
       <title>Play Decrypto Online</title>
@@ -182,9 +183,11 @@ const Home = (props) => {
         {
           TEAMS.map(t => <div key={t} className={t + ' team'}>
             <Scoreboard key={seed} team={t} />
-            <Tray team={t} show={reveal === seed} words={words[t]} />
+            <Tray team={t} show={reveal[seed][t]} words={words[t]} />
             <div className='reveal'>
-              { seed && <button onClick={() => setReveal(seed)}>Reveal</button> }
+              { seed && <button onClick={() => setReveal(
+                {...reveal, [seed]: {...reveal[seed], [t]: 1}}
+              )}>Reveal</button> }
             </div>
           </div>)
         }
@@ -232,13 +235,8 @@ const Home = (props) => {
       }
 
       .trays .reveal {
-        display: none;
         text-align: right;
         margin-right: 0.5rem;
-      }
-
-      .team:last-child .reveal {
-        display: block;
       }
 
       .trays {
