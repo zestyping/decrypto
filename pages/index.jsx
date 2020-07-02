@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import {useMemo, useState} from 'react';
-import {WORDS} from './words';
+import {WORDS} from '../words';
 
 const CODE_BASE = 4;
 const CODE_LENGTH = 3;
