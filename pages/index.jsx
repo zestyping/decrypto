@@ -4,12 +4,13 @@ import {WORDS} from '../words';
 
 const CODE_BASE = 4;
 const CODE_LENGTH = 3;
+const TEAMS = ['infrared', 'ultraviolet'];
 
 const Tray = (props) => <div className={'tray ' + props.team}>
   {
-    props.words.map((word, i) => <div className='slot'>
-      <Card key={i} word={word} show={props.show} digit={i + 1} />
-      <textarea className='pad' key={i} />
+    props.words.map((word, i) => <div className='slot' key={i}>
+      <Card word={word} show={props.show} digit={i + 1} />
+      <textarea className='pad' />
     </div>)
   }
   <style jsx>{`
@@ -21,12 +22,12 @@ const Tray = (props) => <div className={'tray ' + props.team}>
         border-radius: 6px;
       }
 
-      .tray.red {
-        background: #f88;
+      .tray.infrared {
+        background: #f98;
       }
 
-      .tray.blue {
-        background: #8cf;
+      .tray.ultraviolet {
+        background: #98f;
       }
 
       .slot {
@@ -39,7 +40,8 @@ const Tray = (props) => <div className={'tray ' + props.team}>
         margin-top: 1em;
         width: 8rem;
         height: 12em;
-        font-size: 0.8rem;
+        font-size: 1rem;
+        padding: 1ex;
         font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
           Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
       }
@@ -75,7 +77,6 @@ const Card = (props) => <div className='card'>
 </div>
 
 const xmur3 = (str) => {
-  console.log('xmur3', str);
   for (var i = 0, h = 1779033703 ^ str.length; i < str.length; i++) {
     h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
     h = h << 13 | h >>> 19;
@@ -89,8 +90,7 @@ const xmur3 = (str) => {
 
 const generateSeed = () => xmur3('' + (new Date().getTime()))() % 90000 + 10000;
 
-const useRand = (seed) => {
-  console.log('useRand', seed);
+const newRand = (seed) => {
   const rng = xmur3('' + seed);
   return n => rng() % n;
 };
@@ -106,33 +106,36 @@ const generateWords = (rand) => {
   return words;
 };
 
-const generateMessage = (rand) => {
-  const message = [];
-  while (message.length < CODE_LENGTH) {
-    const digit = rand(CODE_BASE);
-    if (!message.includes(digit)) message.push(digit);
-  }
-  return message.join(' ');
-};
-
-const Controls = (props) => {
+const Scoreboard = (props) => {
   const [message, setMessage] = useState('');
   const [misses, setMisses] = useState(0);
   const [interceptions, setInterceptions] = useState(0);
-  return <div className='controls'>
-    <div className='team-select'>
-      <button onClick={() => props.setTeam(props.team)}>I'm on Team {capitalize(props.team)}</button>
-    </div>
-    <div>
-      <button onClick={() => setMessage(generateMessage(props.rand))}>Message to send:</button> <span className='message'>{message}</span>
-      <button className={misses >= 2 ? 'lose' : ''} onClick={() => setMisses(misses + 1)}>Misses: {misses}</button>
-      <button className={interceptions >= 2 ? 'win' : ''} onClick={() => setInterceptions(interceptions + 1)}>Interceptions: {interceptions}</button>
-    </div>
+  return <div className={'scoreboard ' + props.team}>
+    <span className='team-name'>Team {capitalize(props.team)}</span>
+    <button className={misses >= 2 ? 'lose' : ''} onClick={() => setMisses(misses + 1)}>Misses: {misses}</button>
+    <button className={interceptions >= 2 ? 'win' : ''} onClick={() => setInterceptions(interceptions + 1)}>Interceptions: {interceptions}</button>
     <style jsx>{`
-      button {
+      button, .team-name {
         font-size: 1.2rem;
+        margin: 0 1rem;
+      }
+
+      .infrared .team-name {
+        color: #c40;
+      }
+
+      .ultraviolet .team-name {
+        color: #40c;
+      }
+
+      button {
         padding: 0.4rem 0.8rem;
-        margin: 0.5rem 1rem;
+      }
+
+      .team-name {
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 1rem;
       }
 
       .lose {
@@ -144,24 +147,19 @@ const Controls = (props) => {
         background: #8f8;
         border: 1px solid #080;
       }
-
-      .message {
-        font-size: 1.2rem;
-        font-weight: bold;
-      }
     `}</style>
   </div>;
 };
 
 const capitalize = (str) => str.substr(0, 1).toUpperCase() + str.substr(1);
 
-const Home = () => {
+const Home = (props) => {
   const [seed, setSeed] = useState(generateSeed());
-  const [team, setTeam] = useState('');
-  const rand = useRand(seed);
-  const redWords = generateWords(rand);
-  const blueWords = generateWords(rand);
-  const useSeed = () => null;
+  const [reveal, setReveal] = useState(0);
+  const rand = newRand(seed);
+  const words = {};
+  const url = 'decrypto.vercel.app/player?' + seed;
+  for (const team of TEAMS) words[team] = generateWords(rand);
 
   return <div className="container">
     <Head>
@@ -171,19 +169,21 @@ const Home = () => {
     <main>
       <header>
         <h1 className="title">Decrypto</h1>
+        <button onClick={() => setSeed(generateSeed())}>New game</button>
         <input onChange={event => setSeed(event.target.value)} placeholder='Game ID' value={seed} />
-        <button onClick={() => { setTeam(''); setSeed(generateSeed()); }}>New game</button>
+        { seed && <a href={'https://' + url}>{url}</a>  }
       </header>
 
       <div className='trays'>
-        <div className='red team'>
-          <Controls key={seed} rand={rand} team='red' setTeam={setTeam} />
-          <Tray key='red' team='red' show={team === 'red'} words={redWords} />
-        </div>
-        <div className='blue team'>
-          <Controls key={seed} rand={rand} team='blue' setTeam={setTeam} />
-          <Tray key='blue' team='blue' show={team === 'blue'} words={blueWords} />
-        </div>
+        {
+          TEAMS.map(t => <div key={t} className={t + ' team'}>
+            <Scoreboard key={seed} team={t} />
+            <Tray team={t} show={reveal === seed} words={words[t]} />
+            <div className='reveal'>
+              { seed && <button onClick={() => setReveal(seed)}>Reveal</button> }
+            </div>
+          </div>)
+        }
       </div>
 
     </main>
@@ -195,15 +195,21 @@ const Home = () => {
         flex-direction: column;
       }
 
-      a {
-        color: inherit;
-        text-decoration: none;
-      }
-
       .title {
         line-height: 1.15;
         font-size: 2rem;
         padding: 0 1ex;
+      }
+
+      header a {
+        font-size: 1rem;
+        text-decoration: none;
+        opacity: 0.5;
+        color: #04c;
+      }
+
+      header a:hover {
+        opacity: 1;
       }
 
       header {
@@ -211,14 +217,24 @@ const Home = () => {
         align-items: center;
       }
 
-      header input, header button {
+      header input, header button, .trays button {
         font-size: 1.2rem;
         padding: 0.4rem 0.8rem;
-        margin: 0.5rem 1rem;
+        margin: 0.5rem 0.5rem;
       }
 
       header input {
-        width: 10ex;
+        width: 11ex;
+      }
+
+      .trays .reveal {
+        display: none;
+        text-align: right;
+        margin-right: 0.5rem;
+      }
+
+      .team:last-child .reveal {
+        display: block;
       }
 
       .trays {
