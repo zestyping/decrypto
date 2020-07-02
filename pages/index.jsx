@@ -104,13 +104,23 @@ const generateWords = (rand) => {
   return words;
 };
 
+const generateMessage = (rand) => {
+  return Array.from(Array(CODE_LENGTH)).map(() => rand(CODE_BASE) + 1).join(' ');
+};
+
 const Controls = (props) => {
+  const [message, setMessage] = useState('');
   const [strikes, setStrikes] = useState(0);
   const [interceptions, setInterceptions] = useState(0);
   return <div className='controls'>
-    <button onClick={() => props.setTeam(props.team)}>I'm on Team {capitalize(props.team)}</button>
-    <button className={strikes >= 2 ? 'lose' : ''} onClick={() => setStrikes(strikes + 1)}>Strikes: {strikes}</button>
-    <button className={interceptions >= 2 ? 'win' : ''} onClick={() => setInterceptions(interceptions + 1)}>Interceptions: {interceptions}</button>
+    <div className='team-select'>
+      <button onClick={() => props.setTeam(props.team)}>I'm on Team {capitalize(props.team)}</button>
+    </div>
+    <div>
+      <button onClick={() => setMessage(generateMessage(props.rand))}>Message:</button> <span className='message'>{message}</span>
+      <button className={strikes >= 2 ? 'lose' : ''} onClick={() => setStrikes(strikes + 1)}>Strikes: {strikes}</button>
+      <button className={interceptions >= 2 ? 'win' : ''} onClick={() => setInterceptions(interceptions + 1)}>Interceptions: {interceptions}</button>
+    </div>
     <style jsx>{`
       button {
         font-size: 1.2rem;
@@ -156,7 +166,7 @@ const Home = () => {
 
       <div className='trays'>
         <div className='red team'>
-          <Controls key={seed} team='red' setTeam={setTeam} />
+          <Controls key={seed} rand={rand} team='red' setTeam={setTeam} />
           <Tray key='red' team='red' show={team === 'red'} words={redWords} />
         </div>
         <div className='blue team'>
