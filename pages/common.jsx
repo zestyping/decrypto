@@ -4,7 +4,7 @@ import {WORDS} from '../words';
 
 const CODE_BASE = 4;
 const CODE_LENGTH = 3;
-const TEAMS = ['red', 'blue'];
+const TEAMS = ['infrared', 'ultraviolet'];
 
 const Tray = (props) => <div className={'tray ' + props.team}>
   {
@@ -22,12 +22,12 @@ const Tray = (props) => <div className={'tray ' + props.team}>
         border-radius: 6px;
       }
 
-      .tray.red {
-        background: #f88;
+      .tray.infrared {
+        background: #f98;
       }
 
-      .tray.blue {
-        background: #8cf;
+      .tray.ultraviolet {
+        background: #98f;
       }
 
       .slot {
@@ -155,8 +155,7 @@ const Home = (props) => {
         <h1 className="title">Decrypto</h1>
         <button onClick={() => setSeed(generateSeed())}>New game</button>
         <input onChange={event => setSeed(event.target.value)} placeholder='Game ID' value={seed} />
-        { seed && <a href={url}>{url}</a>  }
-        { seed && <button onClick={() => setReveal(seed)}>Reveal</button> }
+        { seed && <a href={'https://' + url}>{url}</a>  }
       </header>
 
       <div className='trays'>
@@ -164,6 +163,9 @@ const Home = (props) => {
           TEAMS.map(t => <div key={t} className={t + ' team'}>
             <Scoreboard key={seed} team={t} />
             <Tray team={t} show={reveal === seed} words={words[t]} />
+            <div className='reveal'>
+              { seed && <button onClick={() => setReveal(seed)}>Reveal</button> }
+            </div>
           </div>)
         }
       </div>
@@ -177,15 +179,21 @@ const Home = (props) => {
         flex-direction: column;
       }
 
-      a {
-        color: inherit;
-        text-decoration: none;
-      }
-
       .title {
         line-height: 1.15;
         font-size: 2rem;
         padding: 0 1ex;
+      }
+
+      header a {
+        font-size: 1rem;
+        text-decoration: none;
+        opacity: 0.5;
+        color: #04c;
+      }
+
+      header a:hover {
+        opacity: 1;
       }
 
       header {
@@ -193,7 +201,7 @@ const Home = (props) => {
         align-items: center;
       }
 
-      header input, header button {
+      header input, header button, .trays button {
         font-size: 1.2rem;
         padding: 0.4rem 0.8rem;
         margin: 0.5rem 0.5rem;
@@ -201,6 +209,16 @@ const Home = (props) => {
 
       header input {
         width: 11ex;
+      }
+
+      .trays .reveal {
+        display: none;
+        text-align: right;
+        margin-right: 0.5rem;
+      }
+
+      .team:last-child .reveal {
+        display: block;
       }
 
       .trays {

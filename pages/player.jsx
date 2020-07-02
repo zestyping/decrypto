@@ -4,7 +4,7 @@ import {WORDS} from '../words';
 
 const CODE_BASE = 4;
 const CODE_LENGTH = 3;
-const TEAMS = ['red', 'blue'];
+const TEAMS = ['infrared', 'ultraviolet'];
 
 const Tray = (props) => <div className={'tray ' + props.team}>
   {
@@ -21,12 +21,12 @@ const Tray = (props) => <div className={'tray ' + props.team}>
         border-radius: 6px;
       }
 
-      .tray.red {
-        background: #f88;
+      .tray.infrared {
+        background: #f98;
       }
 
-      .tray.blue {
-        background: #8cf;
+      .tray.ultraviolet {
+        background: #98f;
       }
 
       .slot {
@@ -177,11 +177,6 @@ const Home = (props) => {
         flex-direction: column;
       }
 
-      a {
-        color: inherit;
-        text-decoration: none;
-      }
-
       .title {
         line-height: 1.15;
         font-size: 2rem;
@@ -201,14 +196,6 @@ const Home = (props) => {
 
       header input {
         width: 11ex;
-      }
-
-      header a {
-        font-size: 1rem;
-      }
-
-      header a:hover {
-        text-decoration: underline;
       }
 
       .trays {
