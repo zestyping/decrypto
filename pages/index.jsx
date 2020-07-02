@@ -6,6 +6,24 @@ const CODE_BASE = 4;
 const CODE_LENGTH = 3;
 const TEAMS = ['infrared', 'ultraviolet'];
 
+const xmur3 = (str) => {
+  for (var i = 0, h = 1779033703 ^ str.length; i < str.length; i++) {
+    h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+    h = h << 13 | h >>> 19;
+  }
+  return () => {
+    h = Math.imul(h ^ h >>> 16, 2246822507);
+    h = Math.imul(h ^ h >>> 13, 3266489909);
+    return (h ^= h >>> 16) >>> 0;
+  };
+};
+
+const generateSeed = () => xmur3('' + (new Date().getTime()))() % 90000 + 10000;
+
+export async function getServerSideProps(context) {
+  return {props: {initialSeed: generateSeed()}};
+}
+
 const Tray = (props) => <div className={'tray ' + props.team}>
   {
     props.words.map((word, i) => <div className='slot' key={i}>
@@ -76,21 +94,6 @@ const Card = (props) => <div className='card'>
   `}</style>
 </div>
 
-const xmur3 = (str) => {
-  for (var i = 0, h = 1779033703 ^ str.length; i < str.length; i++) {
-    h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
-    h = h << 13 | h >>> 19;
-  }
-  return () => {
-    h = Math.imul(h ^ h >>> 16, 2246822507);
-    h = Math.imul(h ^ h >>> 13, 3266489909);
-    return (h ^= h >>> 16) >>> 0;
-  };
-};
-
-const generateSeed = () => xmur3('' + (new Date().getTime()))() % 90000 + 10000;
-const initialSeed = generateSeed();
-
 const newRand = (seed) => {
   const rng = xmur3('' + seed);
   return n => rng() % n;
@@ -155,7 +158,7 @@ const Scoreboard = (props) => {
 const capitalize = (str) => str.substr(0, 1).toUpperCase() + str.substr(1);
 
 const Home = (props) => {
-  const [seed, setSeed] = useState(initialSeed);
+  const [seed, setSeed] = useState(props.initialSeed);
   const [reveal, setReveal] = useState(0);
   const rand = newRand(seed);
   const words = {};
