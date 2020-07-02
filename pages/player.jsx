@@ -117,14 +117,28 @@ const Controls = (props) => {
   const [message, setMessage] = useState('');
   const [misses, setMisses] = useState(0);
   const [interceptions, setInterceptions] = useState(0);
-  return <div className='controls'>
-    <button onClick={props.selectTeam}>I'm on Team {capitalize(props.team)}</button>
+  return <div className={'controls ' + props.team}>
+    <button className='team-name' onClick={props.selectTeam}>I'm on Team {capitalize(props.team)}</button>
     <button onClick={() => setMessage(generateMessage(props.rand))}>Message to send:</button> <span className='message'>{message}</span>
     <style jsx>{`
       button {
         font-size: 1.2rem;
         padding: 0.4rem 0.8rem;
-        margin: 0.5rem 1rem;
+        margin: 0 1rem;
+      }
+
+      .infrared .team-name {
+        color: #c40;
+      }
+
+      .ultraviolet .team-name {
+        color: #40c;
+      }
+
+      .team-name {
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 1rem;
       }
 
       .message {
@@ -163,7 +177,7 @@ const Home = (props) => {
             <Controls key={seed} rand={rand} team={t}
               selectTeam={() => setSeedTeam(`${seed}.${t}`)} />
             <Tray key={t} team={t} words={words[t]}
-              show={seedTeam === `${seed}.${t}`} />
+              show={seed && seedTeam === `${seed}.${t}`} />
           </div>)
         }
       </div>

@@ -110,16 +110,32 @@ const Scoreboard = (props) => {
   const [message, setMessage] = useState('');
   const [misses, setMisses] = useState(0);
   const [interceptions, setInterceptions] = useState(0);
-  return <div className='controls'>
-    <div>
-      <button className={misses >= 2 ? 'lose' : ''} onClick={() => setMisses(misses + 1)}>Misses: {misses}</button>
-      <button className={interceptions >= 2 ? 'win' : ''} onClick={() => setInterceptions(interceptions + 1)}>Interceptions: {interceptions}</button>
-    </div>
+  return <div className={'scoreboard ' + props.team}>
+    <span className='team-name'>Team {capitalize(props.team)}</span>
+    <button className={misses >= 2 ? 'lose' : ''} onClick={() => setMisses(misses + 1)}>Misses: {misses}</button>
+    <button className={interceptions >= 2 ? 'win' : ''} onClick={() => setInterceptions(interceptions + 1)}>Interceptions: {interceptions}</button>
     <style jsx>{`
-      button {
+      button, .team-name {
         font-size: 1.2rem;
+        margin: 0 1rem;
+      }
+
+      .infrared .team-name {
+        color: #c40;
+      }
+
+      .ultraviolet .team-name {
+        color: #40c;
+      }
+
+      button {
         padding: 0.4rem 0.8rem;
-        margin: 0.5rem 1rem;
+      }
+
+      .team-name {
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 1rem;
       }
 
       .lose {
