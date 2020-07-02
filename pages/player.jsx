@@ -86,12 +86,13 @@ const xmur3 = (str) => {
   };
 };
 
-const generateSeed = () => xmur3('' + (new Date().getTime()))() % 90000 + 10000;
-
-const useRand = (seed) => {
+const newRand = (seed) => {
   const rng = xmur3('' + seed);
   return n => rng() % n;
 };
+
+const generateSeed = () => xmur3('' + (new Date().getTime()))() % 90000 + 10000;
+const messageRand = newRand(new Date().getTime());
 
 const range = (n) => Array.from(Array(n).keys());
 
@@ -104,10 +105,10 @@ const generateWords = (rand) => {
   return words;
 };
 
-const generateMessage = (rand) => {
+const generateMessage = () => {
   const message = [];
   while (message.length < CODE_LENGTH) {
-    const digit = rand(CODE_BASE) + 1;
+    const digit = messageRand(CODE_BASE) + 1;
     if (!message.includes(digit)) message.push(digit);
   }
   return message.join(' ');
@@ -119,7 +120,7 @@ const Controls = (props) => {
   const [interceptions, setInterceptions] = useState(0);
   return <div className={'controls ' + props.team}>
     <button className='team-name' onClick={props.selectTeam}>I'm on Team {capitalize(props.team)}</button>
-    <button onClick={() => setMessage(generateMessage(props.rand))}>Message to send:</button> <span className='message'>{message}</span>
+    <button onClick={() => setMessage(generateMessage())}>Message to send:</button> <span className='message'>{message}</span>
     <style jsx>{`
       button {
         font-size: 1.2rem;
@@ -152,11 +153,10 @@ const Controls = (props) => {
 const capitalize = (str) => str.substr(0, 1).toUpperCase() + str.substr(1);
 
 const Home = (props) => {
-  console.log(props);
   const query = (props.url.asPath.match(/\?(.*)/) || [])[1] || '';
   const [seed, setSeed] = useState(query);
   const [seedTeam, setSeedTeam] = useState('');
-  const rand = useRand(seed);
+  const rand = newRand(seed);
   const words = {};
   for (const team of TEAMS) words[team] = generateWords(rand);
 
@@ -173,7 +173,7 @@ const Home = (props) => {
 
       <div className='trays'>
         {
-          TEAMS.map(t => <div className={t + ' team'}>
+          TEAMS.map(t => <div className={t + ' team'} key={t}>
             <Controls key={seed} rand={rand} team={t}
               selectTeam={() => setSeedTeam(`${seed}.${t}`)} />
             <Tray key={t} team={t} words={words[t]}

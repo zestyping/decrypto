@@ -90,7 +90,7 @@ const xmur3 = (str) => {
 
 const generateSeed = () => xmur3('' + (new Date().getTime()))() % 90000 + 10000;
 
-const useRand = (seed) => {
+const newRand = (seed) => {
   const rng = xmur3('' + seed);
   return n => rng() % n;
 };
@@ -156,7 +156,7 @@ const capitalize = (str) => str.substr(0, 1).toUpperCase() + str.substr(1);
 const Home = (props) => {
   const [seed, setSeed] = useState(generateSeed());
   const [reveal, setReveal] = useState(0);
-  const rand = useRand(seed);
+  const rand = newRand(seed);
   const words = {};
   const url = 'decrypto.vercel.app/player?' + seed;
   for (const team of TEAMS) words[team] = generateWords(rand);
